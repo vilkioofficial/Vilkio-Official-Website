@@ -3,18 +3,56 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { WebSocketServer, WebSocket } from "ws";
 import { insertHelpTopicSchema, insertBasicsInstructionSchema, insertWebsiteSchema, insertFeedbackSchema, insertNotificationSchema, insertChatMessageSchema } from "@shared/schema";
+import session from "express-session";
+import { randomUUID } from "crypto";
 
 const ADMIN_PASSWORD = "BusinessDawg2025SyncHQ💎";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Session middleware
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET || randomUUID(),
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      },
+    })
+  );
+
   // Admin authentication middleware
   const requireAdmin = (req: any, res: any, next: any) => {
-    const password = req.headers["x-admin-password"];
-    if (password !== ADMIN_PASSWORD) {
+    if (!req.session.isAdmin) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     next();
   };
+
+  // Admin login
+  app.post("/api/admin/login", (req, res) => {
+    const { password } = req.body;
+    if (password === ADMIN_PASSWORD) {
+      req.session.isAdmin = true;
+      res.json({ success: true });
+    } else {
+      res.status(401).json({ error: "Invalid password" });
+    }
+  });
+
+  // Admin logout
+  app.post("/api/admin/logout", (req, res) => {
+    req.session.destroy(() => {
+      res.json({ success: true });
+    });
+  });
+
+  // Check admin status
+  app.get("/api/admin/status", (req, res) => {
+    res.json({ isAuthenticated: !!req.session.isAdmin });
+  });
 
   // Help Topics
   app.get("/api/help-topics", async (req, res) => {
@@ -181,16 +219,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(message);
     } catch (error) {
       res.status(400).json({ error: "Invalid data" });
-    }
-  });
-
-  // Admin login verification
-  app.post("/api/admin/verify", (req, res) => {
-    const { password } = req.body;
-    if (password === ADMIN_PASSWORD) {
-      res.json({ success: true });
-    } else {
-      res.status(401).json({ error: "Invalid password" });
     }
   });
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { HelpTopic, BasicsInstruction, Website, Feedback } from "@shared/schema";
 
-const ADMIN_PASSWORD = "BusinessDawg2025SyncHQ💎";
-
 export default function AdminControlPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
@@ -34,6 +32,20 @@ export default function AdminControlPage() {
     favicon: "",
     image: "",
   });
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/admin/status");
+        const data = await response.json();
+        setIsAuthenticated(data.isAuthenticated);
+      } catch (error) {
+        console.error("Failed to check auth status:", error);
+      }
+    };
+    checkAuth();
+  }, []);
 
   const { data: helpTopics = [] } = useQuery<HelpTopic[]>({
     queryKey: ["/api/help-topics"],
@@ -56,6 +68,27 @@ export default function AdminControlPage() {
     retry: false,
   });
 
+  const loginMutation = useMutation({
+    mutationFn: async (password: string) => {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!response.ok) {
+        throw new Error("Invalid password");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setIsAuthenticated(true);
+      setPasswordInput("");
+    },
+    onError: () => {
+      alert("Incorrect password");
+    },
+  });
+
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       let endpoint = "";
@@ -72,7 +105,6 @@ export default function AdminControlPage() {
         body: JSON.stringify(data),
         headers: {
           "Content-Type": "application/json",
-          "X-Admin-Password": ADMIN_PASSWORD,
         },
       });
     },
@@ -93,9 +125,6 @@ export default function AdminControlPage() {
     mutationFn: async ({ endpoint, id }: { endpoint: string; id: string }) => {
       return apiRequest(`${endpoint}/${id}`, {
         method: "DELETE",
-        headers: {
-          "X-Admin-Password": ADMIN_PASSWORD,
-        },
       });
     },
     onSuccess: (_, variables) => {
@@ -110,12 +139,7 @@ export default function AdminControlPage() {
   });
 
   const handleLogin = () => {
-    if (passwordInput === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      console.log('Admin authenticated');
-    } else {
-      alert('Incorrect password');
-    }
+    loginMutation.mutate(passwordInput);
   };
 
   const resetForm = () => {
@@ -175,8 +199,13 @@ export default function AdminControlPage() {
                 data-testid="input-admin-password"
               />
             </div>
-            <Button className="w-full" onClick={handleLogin} data-testid="button-admin-login">
-              Login
+            <Button 
+              className="w-full" 
+              onClick={handleLogin} 
+              disabled={loginMutation.isPending}
+              data-testid="button-admin-login"
+            >
+              {loginMutation.isPending ? "Logging in..." : "Login"}
             </Button>
           </CardContent>
         </Card>
