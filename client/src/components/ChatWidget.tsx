@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface ChatMessage {
   id: string;
@@ -15,17 +17,30 @@ interface ChatMessage {
 
 interface ChatWidgetProps {
   messages?: ChatMessage[];
-  onSendMessage?: (message: string) => void;
 }
 
-export default function ChatWidget({ messages = [], onSendMessage }: ChatWidgetProps) {
+export default function ChatWidget({ messages = [] }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
 
+  const sendMessageMutation = useMutation({
+    mutationFn: async (message: string) => {
+      return apiRequest("/api/chat-messages", {
+        method: "POST",
+        body: JSON.stringify({ senderId: "me", message }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chat-messages"] });
+    },
+  });
+
   const handleSend = () => {
     if (inputMessage.trim()) {
-      onSendMessage?.(inputMessage);
-      console.log('Send message:', inputMessage);
+      sendMessageMutation.mutate(inputMessage);
       setInputMessage("");
     }
   };
@@ -100,7 +115,12 @@ export default function ChatWidget({ messages = [], onSendMessage }: ChatWidgetP
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             data-testid="input-chat-message"
           />
-          <Button size="icon" onClick={handleSend} data-testid="button-send-message">
+          <Button
+            size="icon"
+            onClick={handleSend}
+            disabled={sendMessageMutation.isPending}
+            data-testid="button-send-message"
+          >
             <Send className="h-4 w-4" />
           </Button>
         </div>

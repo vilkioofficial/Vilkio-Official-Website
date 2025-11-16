@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery, useMutation } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import IntroVideo from "@/components/IntroVideo";
@@ -18,6 +18,7 @@ import TermsPage from "@/pages/terms";
 import WebsitesPage from "@/pages/websites";
 import AdminControlPage from "@/pages/admin-control";
 import NotFound from "@/pages/not-found";
+import type { Notification, ChatMessage } from "@shared/schema";
 
 function Router() {
   return (
@@ -35,87 +36,106 @@ function Router() {
   );
 }
 
-function App() {
+function AppContent() {
   const [introComplete, setIntroComplete] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [location] = useLocation();
 
   const shouldShowIntro = location === "/" && !sessionStorage.getItem("vilkio_intro_seen");
 
-  const mockNotifications = [
-    {
-      id: '1',
-      message: 'New help topic added: Getting Started with Vilkio',
-      isRead: false,
-      createdAt: '2 hours ago',
-    },
-    {
-      id: '2',
-      message: 'Website portfolio updated with new projects',
-      isRead: false,
-      createdAt: '1 day ago',
-    },
-    {
-      id: '3',
-      message: 'Privacy policy has been updated',
-      isRead: true,
-      createdAt: '3 days ago',
-    },
-  ];
+  const { data: notifications = [] } = useQuery<Notification[]>({
+    queryKey: ["/api/notifications"],
+  });
 
-  const mockChatMessages = [
-    {
-      id: '1',
-      senderId: 'admin',
-      message: 'Welcome to the staff chat!',
-      createdAt: '10:00 AM',
-      isMine: false,
-    },
-    {
-      id: '2',
-      senderId: 'me',
-      message: 'Thanks! Everything looks great.',
-      createdAt: '10:05 AM',
-      isMine: true,
-    },
-  ];
+  const { data: chatMessages = [] } = useQuery<ChatMessage[]>({
+    queryKey: ["/api/chat-messages"],
+  });
 
-  const unreadCount = mockNotifications.filter(n => !n.isRead).length;
+  const markAsReadMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/notifications/${id}/read`, {
+        method: "PATCH",
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
+    },
+  });
+
+  // WebSocket connection for real-time updates
+  useEffect(() => {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "notification") {
+        queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
+      } else if (data.type === "chat") {
+        queryClient.invalidateQueries({ queryKey: ["/api/chat-messages"] });
+      }
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const handleMarkAsRead = (id: string) => {
-    console.log('Mark notification as read:', id);
+    markAsReadMutation.mutate(id);
   };
 
+  const formattedNotifications = notifications.map(n => ({
+    ...n,
+    createdAt: new Date(n.createdAt!).toLocaleString(),
+  }));
+
+  const formattedChatMessages = chatMessages.map(msg => ({
+    ...msg,
+    createdAt: new Date(msg.createdAt!).toLocaleTimeString(),
+    isMine: msg.senderId === 'me',
+  }));
+
+  return (
+    <>
+      {shouldShowIntro && !introComplete && (
+        <IntroVideo onComplete={() => setIntroComplete(true)} />
+      )}
+      
+      <div className="min-h-screen flex flex-col">
+        <Header
+          unreadCount={unreadCount}
+          onNotificationClick={() => setShowNotifications(!showNotifications)}
+        />
+        
+        <main className="flex-1">
+          <Router />
+        </main>
+        
+        <Footer />
+      </div>
+
+      {showNotifications && (
+        <NotificationPanel
+          notifications={formattedNotifications}
+          onClose={() => setShowNotifications(false)}
+          onMarkAsRead={handleMarkAsRead}
+        />
+      )}
+
+      <ChatWidget messages={formattedChatMessages} />
+    </>
+  );
+}
+
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        {shouldShowIntro && !introComplete && (
-          <IntroVideo onComplete={() => setIntroComplete(true)} />
-        )}
-        
-        <div className="min-h-screen flex flex-col">
-          <Header
-            unreadCount={unreadCount}
-            onNotificationClick={() => setShowNotifications(!showNotifications)}
-          />
-          
-          <main className="flex-1">
-            <Router />
-          </main>
-          
-          <Footer />
-        </div>
-
-        {showNotifications && (
-          <NotificationPanel
-            notifications={mockNotifications}
-            onClose={() => setShowNotifications(false)}
-            onMarkAsRead={handleMarkAsRead}
-          />
-        )}
-
-        <ChatWidget messages={mockChatMessages} />
-        
+        <AppContent />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

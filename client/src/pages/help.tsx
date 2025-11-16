@@ -1,23 +1,12 @@
+import { useQuery } from "@tanstack/react-query";
 import HelpTopicCard from "@/components/HelpTopicCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { HelpTopic } from "@shared/schema";
 
 export default function HelpPage() {
-  const mockTopics = [
-    {
-      id: "getting-started",
-      title: "Getting Started",
-      description: "Learn the basics of using our platform and setting up your first project.",
-    },
-    {
-      id: "faq",
-      title: "Frequently Asked Questions",
-      description: "Find answers to common questions about features, billing, and support.",
-    },
-    {
-      id: "troubleshooting",
-      title: "Troubleshooting",
-      description: "Resolve common issues and learn how to get help when you need it.",
-    },
-  ];
+  const { data: topics, isLoading } = useQuery<HelpTopic[]>({
+    queryKey: ["/api/help-topics"],
+  });
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-4xl" data-testid="page-help">
@@ -29,9 +18,21 @@ export default function HelpPage() {
       </div>
 
       <div className="space-y-4">
-        {mockTopics.map((topic) => (
-          <HelpTopicCard key={topic.id} {...topic} />
-        ))}
+        {isLoading ? (
+          <>
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </>
+        ) : topics && topics.length > 0 ? (
+          topics.map((topic) => (
+            <HelpTopicCard key={topic.id} {...topic} />
+          ))
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            No help topics available yet. Check back soon!
+          </div>
+        )}
       </div>
     </div>
   );

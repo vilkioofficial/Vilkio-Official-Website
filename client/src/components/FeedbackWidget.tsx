@@ -1,21 +1,36 @@
 import { useState } from "react";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface FeedbackWidgetProps {
   pageId: string;
-  onFeedback?: (pageId: string, isHelpful: boolean) => void;
 }
 
-export default function FeedbackWidget({ pageId, onFeedback }: FeedbackWidgetProps) {
+export default function FeedbackWidget({ pageId }: FeedbackWidgetProps) {
   const [submitted, setSubmitted] = useState(false);
   const [isHelpful, setIsHelpful] = useState<boolean | null>(null);
+
+  const feedbackMutation = useMutation({
+    mutationFn: async (isHelpful: boolean) => {
+      return apiRequest("/api/feedback", {
+        method: "POST",
+        body: JSON.stringify({ pageId, isHelpful }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    },
+    onSuccess: () => {
+      console.log('Feedback submitted successfully');
+    },
+  });
 
   const handleFeedback = (helpful: boolean) => {
     setIsHelpful(helpful);
     setSubmitted(true);
-    onFeedback?.(pageId, helpful);
-    console.log('Feedback submitted:', { pageId, isHelpful: helpful });
+    feedbackMutation.mutate(helpful);
   };
 
   return (
