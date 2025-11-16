@@ -100,6 +100,8 @@ export default function AdminControlPage() {
         endpoint = "/api/websites";
       }
 
+      console.log("Creating content at endpoint:", endpoint, "with data:", data);
+      
       return apiRequest(endpoint, {
         method: "POST",
         body: JSON.stringify(data),
@@ -108,7 +110,8 @@ export default function AdminControlPage() {
         },
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Create mutation successful:", data);
       if (activeCategory === "help") {
         queryClient.invalidateQueries({ queryKey: ["/api/help-topics"] });
       } else if (activeCategory === "basics") {
@@ -118,6 +121,10 @@ export default function AdminControlPage() {
       }
       setShowAddDialog(false);
       resetForm();
+    },
+    onError: (error) => {
+      console.error("Create mutation error:", error);
+      alert("Failed to create content: " + (error instanceof Error ? error.message : "Unknown error"));
     },
   });
 
@@ -155,6 +162,8 @@ export default function AdminControlPage() {
   };
 
   const handleSubmit = () => {
+    console.log("handleSubmit called with activeCategory:", activeCategory, "formData:", formData);
+    
     if (activeCategory === "help") {
       createMutation.mutate({
         title: formData.title,
