@@ -24,17 +24,17 @@ export default function Header({ unreadCount = 0, onNotificationClick }: HeaderP
   return (
     <header className="sticky top-0 z-40 bg-background border-b h-16 flex items-center px-6" data-testid="header-main">
       <div className="flex items-center gap-8 flex-1">
-        <Link href="/">
-          <a className="flex items-center gap-2 hover-elevate active-elevate-2 rounded-md px-2 py-1" data-testid="link-home">
+        <Link href="/" data-testid="link-home">
+          <span className="flex items-center gap-2 hover-elevate active-elevate-2 rounded-md px-2 py-1 cursor-pointer">
             <img src={logoImg} alt="Vilkio" className="h-8" />
-          </a>
+          </span>
         </Link>
 
         <nav className="flex items-center gap-1">
           {navLinks.map((link) => (
             <Link key={link.path} href={link.path}>
-              <a
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors hover-elevate active-elevate-2 ${
+              <span
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors hover-elevate active-elevate-2 cursor-pointer inline-block ${
                   location === link.path
                     ? "text-primary"
                     : "text-foreground"
@@ -42,7 +42,7 @@ export default function Header({ unreadCount = 0, onNotificationClick }: HeaderP
                 data-testid={`link-nav-${link.label.toLowerCase()}`}
               >
                 {link.label}
-              </a>
+              </span>
             </Link>
           ))}
         </nav>

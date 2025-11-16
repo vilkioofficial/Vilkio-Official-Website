@@ -45,18 +45,14 @@ export default function HomePage() {
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/help">
-              <a>
-                <Button size="lg" data-testid="button-get-started">
-                  Get Started
-                </Button>
-              </a>
+              <Button size="lg" data-testid="button-get-started">
+                Get Started
+              </Button>
             </Link>
             <Link href="/websites">
-              <a>
-                <Button size="lg" variant="outline" data-testid="button-view-portfolio">
-                  View Portfolio
-                </Button>
-              </a>
+              <Button size="lg" variant="outline" data-testid="button-view-portfolio">
+                View Portfolio
+              </Button>
             </Link>
           </div>
         </div>
@@ -65,20 +61,18 @@ export default function HomePage() {
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Link key={feature.link} href={feature.link}>
-                <a data-testid={`card-feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <Card className="hover-elevate active-elevate-2 transition-all cursor-pointer h-full">
-                    <CardHeader>
-                      <div className="flex flex-col items-center text-center gap-3">
-                        <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <CardTitle className="text-lg">{feature.title}</CardTitle>
-                        <CardDescription>{feature.description}</CardDescription>
+              <Link key={feature.link} href={feature.link} data-testid={`card-feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                <Card className="hover-elevate active-elevate-2 transition-all cursor-pointer h-full">
+                  <CardHeader>
+                    <div className="flex flex-col items-center text-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Icon className="h-6 w-6 text-primary" />
                       </div>
-                    </CardHeader>
-                  </Card>
-                </a>
+                      <CardTitle className="text-lg">{feature.title}</CardTitle>
+                      <CardDescription>{feature.description}</CardDescription>
+                    </div>
+                  </CardHeader>
+                </Card>
               </Link>
             );
           })}
