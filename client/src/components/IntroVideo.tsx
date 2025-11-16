@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import videoSrc from "@assets/output_free_1763271270386.mp4";
+import videoSrc from "@assets/lv_0_20251116151021_1763277420946.mp4";
 
 export default function IntroVideo({ onComplete }: { onComplete: () => void }) {
   const [isPlaying, setIsPlaying] = useState(true);
