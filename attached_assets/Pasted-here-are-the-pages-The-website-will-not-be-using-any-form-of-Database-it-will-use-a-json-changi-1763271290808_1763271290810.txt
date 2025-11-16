@@ -1,0 +1,75 @@
+here are the pages:
+[!] The website will not be using any form of Database it will use a json changing trick that it will update the website/page everytime there's data being sent or a page was created
+[!] Each Page will have a Question on the bottom saying "Is this Helpful?" with a yes and no button on the bottom it will send this on the control page automatically.
+[!] Each categories content will be blank for now, to put some,
+Me as the owner will manually change it on the websites Administrator Page/Control Page this would be a hidden page that doesn't have a button in the official public website to get redirected, so the only thing to access it by manually putting the url and putting the password [Password:BusinessDawg2025SyncHQ💎]
+it will give access to the control page, I would need to simply have a list this is where I'm still on the websites preview but the only thing is I have admin buttons which I can change the main public website for example go to the Help Category on the control room page I can simply click "Add Topic" I can add the Title, description, and then content and even add images and more after added it will refresh the whole website so the website know to update the website so everyone can see it, and also on the control room I just need to hold the asset or anything I added, it will have a option to uncheck or check assets I've putten and delete them or edit.
+
+Categories:
+Help Category 
+- To make new users know things and may help people if needed 
+Contents:
+- Contents will be added manually by the control page or admins
+Features for Control Page:The admins can add new help topics by clicking "Add Topic" this will show a ui to put the title, description, and the content inside, also it can have simple text features like:
+[!] Feature: Will automatically turn a YouTube url into a simple looking thumbnail of that YouTube video when clicked it will go to that url
+- Word spacing 
+- Positioning Selected (when a text is selected using the highlight function the user can pick middle, right, left)
+- Turn into a highlighted text
+- A line in the middle 
+- Slant 
+- Place the picture/Image anywhere by holding and dragging it around 
+- Text adjust automatically when there's a image
+- Add Links 
+ | - It will turn to a Bold, blue, underlined text
+ | - Can turn the plain link text to a clickable image
+- Can Edit everything easily by simply clicking and for image can simply drag or change 
+- After everything it will show you the Preview Box to let the admin know how it looks and then the admin clicks confirm
+- it can delete a asset/images by holding then checking in the checkbox and then clicking Delete and then confirm.
+On the main page for example "app.web.app/main/help" it will have simple no images thumbnails very simple like the title is bolded and the short description while the content inside is hidden until it's clicked after clicked it will go to that topics page for example "app.web.app/main/help/topictitle" it will have all the contents.
+
+Basics Page
+Basics Page will contain all the Instructions of each Website 
+Content:
+The admins will put it manually
+Features for Control Page:
+Has also a Add button but it's called "Add Instructions" it will still work just like Help page but in another category of instructions but it will have new features on the text:
+ - It ask for the website URL so beside the Title will be the url with the favicon
+ - When a key command is typed for example I type "Ctrl+F" it will automatically label it as a key command so it will Bold it and Will put it on a box
+
+Privacy Page
+Will contain all the information to the privacy of the user and no information was safe on certain websites. 
+content:
+You generate it
+
+Terms & Policies, 
+Content:
+you generate
+
+Websites
+- Showcases all the websites that this company had created
+Contents:
+Has a list of thumbnails snippets for now theres nothing.
+Features for Control Page:
+The admins have the ability to add other Websites by clicking "Add Website" it will show a url so the admins can put the URL of that website title Description and images.
+[!]When a snippet idps clicked it won't go to a page it will get redirected to that page so the whole design is in the thumbnail snippet not what's inside 
+
+[!]Add more Features/Pages/Contents
+
+[!] To make it clear this website 
+
+[!] Try to make buttons a ui/icon
+
+[!] The MP4 is the websites intro so when the website is opened it will show the intro and end after it's done showing, and the intro will cancel if gets redirected for example: a man clicked and opened the website it will show the intro but when a user opens a url that is still by the website but has a extra words like /091932 It won't show the Intro.
+
+[?] Information [ i ]
+- Website Name:Vilkio
+- Contains a Favicon
+- Footer: ©2025 - Vilkio - J. B.
+ 
+- {Reminders} -
+1.The Chat feature is only meant for Staffs not Default Users
+2.The Admin page or control page will be also simple and still easily managed with properly placed buttons and placements the button to add something on a category or page will be in the bottom right 
+3. Make it clean, easy to find ui, desktop ui (very small ui) but can be set on the settings
+4.The Website will have a Notification system the notification ui will be on the top right it will have a red dot when theirs announcements or if you4a staff someone texted you.
+
+Try your best to make this Perfect thats all :)
