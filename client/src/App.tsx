@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery, useMutation } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import IntroVideo from "@/components/IntroVideo";
+import { useIntro } from "./hooks/useIntro";
+import { IntroPlayer } from "./components/IntroPlayer";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NotificationPanel from "@/components/NotificationPanel";
@@ -37,11 +38,8 @@ function Router() {
 }
 
 function AppContent() {
-  const [introComplete, setIntroComplete] = useState(false);
+  const { showIntro, onIntroFinish } = useIntro();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [location] = useLocation();
-
-  const shouldShowIntro = location === "/" && !sessionStorage.getItem("vilkio_intro_seen");
 
   const { data: notifications = [] } = useQuery<Notification[]>({
     queryKey: ["/api/notifications"],
@@ -99,12 +97,12 @@ function AppContent() {
     isMine: msg.senderId === 'me',
   }));
 
+  if (showIntro) {
+    return <IntroPlayer onIntroFinish={onIntroFinish} />;
+  }
+
   return (
     <>
-      {shouldShowIntro && !introComplete && (
-        <IntroVideo onComplete={() => setIntroComplete(true)} />
-      )}
-      
       <div className="min-h-screen flex flex-col">
         <Header
           unreadCount={unreadCount}

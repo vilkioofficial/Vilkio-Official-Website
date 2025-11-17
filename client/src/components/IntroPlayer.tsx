@@ -9,7 +9,7 @@ export const IntroPlayer = ({ onIntroFinish }: IntroPlayerProps) => {
 
   // This is a placeholder for the actual video path.
   // I will get the correct path from you later.
-  const videoSrc = '/path/to/your/intro.mp4'; 
+  const videoSrc = '/intro.mp4'; 
 
   useEffect(() => {
     const video = document.createElement('video');
